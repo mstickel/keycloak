@@ -18,6 +18,7 @@
 package org.keycloak.models;
 
 import org.keycloak.common.enums.SslRequired;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.provider.ProviderEvent;
 import org.keycloak.storage.UserStorageProvider;
@@ -115,6 +116,10 @@ public interface RealmModel extends RoleContainerModel {
     boolean isUserManagedAccessAllowed();
 
     void setUserManagedAccessAllowed(boolean userManagedAccessAllowed);
+
+    InvitationStatus getInvitation();
+
+    void setInvitation(InvitationStatus invitation);
 
     void setAttribute(String name, String value);
     void setAttribute(String name, Boolean value);

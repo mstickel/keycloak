@@ -128,7 +128,10 @@ public enum EventType {
     TOKEN_EXCHANGE_ERROR(true),
 
     PERMISSION_TOKEN(true),
-    PERMISSION_TOKEN_ERROR(false);
+    PERMISSION_TOKEN_ERROR(false),
+
+    SEND_INVITE(true),
+    ACCEPT_INVITE(true);
 
     private boolean saveByDefault;
 

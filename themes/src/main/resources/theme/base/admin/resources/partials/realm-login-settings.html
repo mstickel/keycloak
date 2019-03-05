@@ -17,6 +17,19 @@
                 </div>
                 <kc-tooltip>{{:: 'registrationEmailAsUsername.tooltip' | translate}}</kc-tooltip>
             </div>
+            <div class="form-group" ng-show="realm.registrationAllowed">
+                <label for="invitation" class="col-md-2 control-label">{{:: 'invitation' | translate}}</label>
+                <div class="col-md-2">
+                    <div>
+                        <select id="invitation" ng-model="realm.invitation" class="form-control">
+                            <option value="disabled">{{:: 'invitation.option.disabled' | translate}}</option>
+                            <option value="required">{{:: 'invitation.option.required' | translate}}</option>
+                            <option value="optional">{{:: 'invitation.option.optional' | translate}}</option>
+                        </select>
+                    </div>
+                </div>
+                <kc-tooltip>{{:: 'invitation.tooltip' | translate}}</kc-tooltip>
+            </div>
             <div class="form-group">
                 <label for="editUsernameAllowed" class="col-md-2 control-label">{{:: 'editUsernameAllowed' | translate}}</label>
                 <div class="col-md-6">

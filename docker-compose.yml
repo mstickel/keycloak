@@ -1,0 +1,15 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:5.7.21
+    ports:
+      - "3321:3306"
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: "foobar"
+    volumes:
+      - ~/docker-compose/ssdev/keycloakdev/mysql:/var/lib/mysql
+
+    

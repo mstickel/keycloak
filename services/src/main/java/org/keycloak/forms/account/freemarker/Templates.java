@@ -44,6 +44,10 @@ public class Templates {
                 return "resources.ftl";
             case RESOURCE_DETAIL:
                 return "resource-detail.ftl";
+            case INVITATIONS:
+                return "invitations.ftl";
+            case SEND_INVITATION:
+                return "send-invite.ftl";
             default:
                 throw new IllegalArgumentException();
         }

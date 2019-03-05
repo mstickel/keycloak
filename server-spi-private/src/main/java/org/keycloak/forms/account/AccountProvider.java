@@ -18,6 +18,7 @@
 package org.keycloak.forms.account;
 
 import org.keycloak.events.Event;
+import org.keycloak.models.InvitationModel;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
@@ -60,6 +61,8 @@ public interface AccountProvider extends Provider {
     AccountProvider setEvents(List<Event> events);
 
     AccountProvider setSessions(List<UserSessionModel> sessions);
+
+    AccountProvider setInvitations(List<InvitationModel> invitations);
 
     AccountProvider setPasswordSet(boolean passwordSet);
 

@@ -17,6 +17,7 @@
 
 package org.keycloak.models.cache.infinispan.entities;
 
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentModel;
@@ -63,6 +64,7 @@ public class CachedRealm extends AbstractExtendableRevisioned {
     protected boolean resetPasswordAllowed;
     protected boolean identityFederationEnabled;
     protected boolean editUsernameAllowed;
+    protected InvitationStatus invitation;
     //--- brute force settings
     protected boolean bruteForceProtected;
     protected boolean permanentLockout;
@@ -171,6 +173,7 @@ public class CachedRealm extends AbstractExtendableRevisioned {
         resetPasswordAllowed = model.isResetPasswordAllowed();
         identityFederationEnabled = model.isIdentityFederationEnabled();
         editUsernameAllowed = model.isEditUsernameAllowed();
+        invitation = model.getInvitation();
         //--- brute force settings
         bruteForceProtected = model.isBruteForceProtected();
         permanentLockout = model.isPermanentLockout();
@@ -395,6 +398,10 @@ public class CachedRealm extends AbstractExtendableRevisioned {
 
     public boolean isEditUsernameAllowed() {
         return editUsernameAllowed;
+    }
+
+    public InvitationStatus getInvitation() {
+        return invitation;
     }
 
     public String getDefaultSignatureAlgorithm() {
@@ -684,4 +691,6 @@ public class CachedRealm extends AbstractExtendableRevisioned {
     public boolean isAllowUserManagedAccess() {
         return allowUserManagedAccess;
     }
+
+
 }

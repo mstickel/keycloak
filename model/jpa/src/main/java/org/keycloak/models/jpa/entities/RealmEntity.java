@@ -80,6 +80,8 @@ public class RealmEntity {
     protected boolean duplicateEmailsAllowed;
     @Column(name="REMEMBER_ME")
     protected boolean rememberMe;
+    @Column(name="INVITATION")
+    protected String invitation;
 
     @Column(name="PASSWORD_POLICY")
     protected String passwordPolicy;
@@ -792,6 +794,14 @@ public class RealmEntity {
 
     public boolean isAllowUserManagedAccess() {
         return allowUserManagedAccess;
+    }
+
+    public String getInvitation() {
+        return invitation;
+    }
+
+    public void setInvitation(String invitation) {
+        this.invitation = invitation;
     }
 
     @Override

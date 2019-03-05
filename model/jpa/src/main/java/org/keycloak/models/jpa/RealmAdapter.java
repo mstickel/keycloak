@@ -18,6 +18,7 @@
 package org.keycloak.models.jpa;
 
 import org.jboss.logging.Logger;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentFactory;
@@ -125,6 +126,17 @@ public class RealmAdapter implements RealmModel, JpaModel<RealmEntity> {
     public void setUserManagedAccessAllowed(boolean userManagedAccessAllowed) {
         realm.setAllowUserManagedAccess(userManagedAccessAllowed);
         em.flush();
+    }
+
+    @Override
+    public InvitationStatus getInvitation() {
+        return realm.getInvitation() != null ? InvitationStatus.valueOf(realm.getInvitation()) : null;
+    }
+
+    @Override
+    public void setInvitation(InvitationStatus invitation) {
+        realm.setInvitation(invitation.name());
+        em.flush();;
     }
 
     @Override

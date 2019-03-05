@@ -18,6 +18,7 @@
 package org.keycloak.representations.idm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.util.MultivaluedHashMap;
 
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ public class RealmRepresentation {
     protected Boolean duplicateEmailsAllowed;
     protected Boolean resetPasswordAllowed;
     protected Boolean editUsernameAllowed;
+    protected String invitation;
 
     @Deprecated
     protected Boolean userCacheEnabled;
@@ -1046,4 +1048,13 @@ public class RealmRepresentation {
     public Boolean isUserManagedAccessAllowed() {
         return userManagedAccessAllowed;
     }
+
+    public String getInvitation() {
+        return invitation;
+    }
+
+    public void setInvitation(String invitation) {
+        this.invitation = invitation;
+    }
+
 }

@@ -95,4 +95,12 @@ public class UrlBean {
         return uri.getPath() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName();
     }
 
+    public String getInvitationsUrl() {
+        return Urls.accountInvitationsPage(baseQueryURI, realm).toString();
+    }
+
+    public String getSendInviteUrl() {
+        return Urls.accountSendInvitePage(baseQueryURI, realm).toString();
+    }
+
 }

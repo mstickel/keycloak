@@ -17,6 +17,7 @@
 package org.keycloak.services.managers;
 
 import org.keycloak.Config;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.migration.MigrationModelManager;
 import org.keycloak.models.AccountRoles;
@@ -238,6 +239,7 @@ public class RealmManager {
         realm.setSslRequired(SslRequired.EXTERNAL);
         realm.setOTPPolicy(OTPPolicy.DEFAULT_POLICY);
         realm.setLoginWithEmailAllowed(true);
+        realm.setInvitation(InvitationStatus.DISABLED);
 
         realm.setEventsListeners(Collections.singleton("jboss-logging"));
     }

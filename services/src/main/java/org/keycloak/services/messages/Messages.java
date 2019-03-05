@@ -230,4 +230,6 @@ public class Messages {
     public static final String DELEGATION_FAILED = "delegationFailedMessage";
     public static final String DELEGATION_FAILED_HEADER = "delegationFailedHeader";
 
+    public static final String INVITATION_NOT_ALLOWED = "invitationNotAllowed";
+    public static final String INVITE_SENT = "invitationSent";
 }

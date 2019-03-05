@@ -18,6 +18,7 @@
 package org.keycloak.models.cache.infinispan;
 
 import org.keycloak.Config;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.*;
@@ -199,6 +200,18 @@ public class RealmAdapter implements CachedRealmModel {
     public void setRememberMe(boolean rememberMe) {
         getDelegateForUpdate();
         updated.setRememberMe(rememberMe);
+    }
+
+    @Override
+    public InvitationStatus getInvitation() {
+        if (isUpdated()) return updated.getInvitation();
+        return cached.getInvitation();
+    }
+
+    @Override
+    public void setInvitation(InvitationStatus invitation) {
+        getDelegateForUpdate();
+        updated.setInvitation(invitation);
     }
 
     @Override

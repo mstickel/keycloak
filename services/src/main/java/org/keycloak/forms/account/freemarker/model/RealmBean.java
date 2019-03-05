@@ -16,6 +16,7 @@
  */
 package org.keycloak.forms.account.freemarker.model;
 
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.models.RealmModel;
 
 import java.util.Set;
@@ -71,5 +72,9 @@ public class RealmBean {
 
     public boolean isUserManagedAccessAllowed() {
         return realm.isUserManagedAccessAllowed();
+    }
+
+    public boolean isInvitationsDisabled() {
+        return InvitationStatus.DISABLED.equals(realm.getInvitation());
     }
 }

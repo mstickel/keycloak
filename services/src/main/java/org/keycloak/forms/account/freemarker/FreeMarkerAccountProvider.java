@@ -17,25 +17,12 @@
 package org.keycloak.forms.account.freemarker;
 
 import org.jboss.logging.Logger;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.events.Event;
 import org.keycloak.forms.account.AccountPages;
 import org.keycloak.forms.account.AccountProvider;
-import org.keycloak.forms.account.freemarker.model.AccountBean;
-import org.keycloak.forms.account.freemarker.model.AccountFederatedIdentityBean;
-import org.keycloak.forms.account.freemarker.model.ApplicationsBean;
-import org.keycloak.forms.account.freemarker.model.AuthorizationBean;
-import org.keycloak.forms.account.freemarker.model.FeaturesBean;
-import org.keycloak.forms.account.freemarker.model.LogBean;
-import org.keycloak.forms.account.freemarker.model.PasswordBean;
-import org.keycloak.forms.account.freemarker.model.RealmBean;
-import org.keycloak.forms.account.freemarker.model.ReferrerBean;
-import org.keycloak.forms.account.freemarker.model.SessionsBean;
-import org.keycloak.forms.account.freemarker.model.TotpBean;
-import org.keycloak.forms.account.freemarker.model.UrlBean;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
-import org.keycloak.models.UserSessionModel;
+import org.keycloak.forms.account.freemarker.model.*;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.theme.BrowserSecurityHeaderSetup;
 import org.keycloak.theme.FreeMarkerException;
@@ -81,6 +68,7 @@ public class FreeMarkerAccountProvider implements AccountProvider {
     protected List<Event> events;
     protected String stateChecker;
     protected List<UserSessionModel> sessions;
+    protected List<InvitationModel> invitations;
     protected boolean identityProviderEnabled;
     protected boolean eventsEnabled;
     protected boolean passwordUpdateSupported;
@@ -192,6 +180,11 @@ public class FreeMarkerAccountProvider implements AccountProvider {
                     return Response.status(Status.FORBIDDEN).build();
                 }
                 attributes.put("authorization", new AuthorizationBean(session, user, uriInfo));
+            case INVITATIONS:
+                if (InvitationStatus.DISABLED.equals(realm.getInvitation())) {
+                    return Response.status(Status.FORBIDDEN).build();
+                }
+                attributes.put("invitations", new InvitationsBean(session, realm, user, invitations));
         }
 
         return processTemplate(theme, page, attributes, locale);
@@ -360,6 +353,12 @@ public class FreeMarkerAccountProvider implements AccountProvider {
     @Override
     public AccountProvider setSessions(List<UserSessionModel> sessions) {
         this.sessions = sessions;
+        return this;
+    }
+
+    @Override
+    public AccountProvider setInvitations(List<InvitationModel> invitations) {
+        this.invitations = invitations;
         return this;
     }
 

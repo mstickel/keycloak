@@ -92,4 +92,5 @@ public interface Errors {
     String ILLEGAL_ORIGIN = "illegal_origin";
     String DISPLAY_UNSUPPORTED = "display_unsupported";
 
+    String INVITATION_DISABLED = "invitation_disabled";
 }

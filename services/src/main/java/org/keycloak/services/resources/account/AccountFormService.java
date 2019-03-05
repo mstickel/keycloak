@@ -24,8 +24,6 @@ import org.keycloak.authorization.model.Resource;
 import org.keycloak.authorization.model.Scope;
 import org.keycloak.authorization.store.PermissionTicketStore;
 import org.keycloak.authorization.store.PolicyStore;
-import org.keycloak.common.Profile;
-import org.keycloak.common.Profile.Feature;
 import org.keycloak.common.util.Base64Url;
 import org.keycloak.common.util.Time;
 import org.keycloak.common.util.UriUtils;
@@ -39,18 +37,10 @@ import org.keycloak.events.EventType;
 import org.keycloak.forms.account.AccountPages;
 import org.keycloak.forms.account.AccountProvider;
 import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.models.AccountRoles;
-import org.keycloak.models.AuthenticatedClientSessionModel;
-import org.keycloak.models.ClientModel;
-import org.keycloak.models.FederatedIdentityModel;
-import org.keycloak.models.IdentityProviderModel;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.ModelDuplicateException;
-import org.keycloak.models.ModelException;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
-import org.keycloak.models.UserSessionModel;
+import org.keycloak.invite.InvitationProvider;
+import org.keycloak.invite.InvitationProviderFactory;
+import org.keycloak.invite.InvitationService;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.CredentialValidation;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
@@ -126,6 +116,7 @@ public class AccountFormService extends AbstractSecuredLocalService {
     private EventBuilder event;
     private AccountProvider account;
     private EventStoreProvider eventStore;
+    private InvitationProvider invitationProvider;
 
     public AccountFormService(RealmModel realm, ClientModel client, EventBuilder event) {
         super(realm, client);
@@ -135,6 +126,7 @@ public class AccountFormService extends AbstractSecuredLocalService {
 
     public void init() {
         eventStore = session.getProvider(EventStoreProvider.class);
+        invitationProvider = session.getProvider(InvitationProvider.class);
 
         account = session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(session.getContext().getUri()).setHttpHeaders(headers);
 
@@ -304,6 +296,22 @@ public class AccountFormService extends AbstractSecuredLocalService {
     @GET
     public Response applicationsPage() {
         return forwardToPage("applications", AccountPages.APPLICATIONS);
+    }
+
+    @Path("invitations")
+    @GET
+    public Response invitationsPage() {
+        logger.error("invitationsPage(): realm is " + (realm != null ? realm.getName() : "null realm") + "; user is: " + (auth != null ? auth.getUser() : "null auth"));
+        List<InvitationModel> invitations = invitationProvider.findForUser(realm, auth.getUser());
+        logger.error("invitationsPage(): found " + (invitations != null ? invitations.size() : "null") + " invitations");
+        account.setInvitations(invitations);
+        return forwardToPage("invitations", AccountPages.INVITATIONS);
+    }
+
+    @Path("sendInvite")
+    @GET
+    public Response sendInvitePage() {
+        return forwardToPage("sendInvite", AccountPages.SEND_INVITATION);
     }
 
     /**
@@ -932,6 +940,30 @@ public class AccountFormService extends AbstractSecuredLocalService {
 
         return forwardToPage("authorization", AccountPages.RESOURCES);
     }
+
+    @Path("sendInvite")
+    @POST
+    public Response processInvite(final MultivaluedMap<String, String> formData) {
+        if (auth == null) {
+            return login("invitations");
+        }
+
+        auth.require(AccountRoles.MANAGE_ACCOUNT);
+
+        String emailToInvite = formData.getFirst("email");
+        UserModel inviter = auth.getUser();
+
+        InvitationProviderFactory invitationProviderFactory = (InvitationProviderFactory) session
+                .getKeycloakSessionFactory().getProviderFactory(InvitationProvider.class);
+        InvitationProvider invitationProvider = invitationProviderFactory.create(session);
+
+        InvitationService invitationService = new InvitationService(invitationProvider);
+        invitationService.invite(realm, inviter, emailToInvite);
+
+        List<InvitationModel> invitations = invitationProvider.findForUser(realm, auth.getUser());
+        return account.setSuccess(Messages.INVITE_SENT).setInvitations(invitations).createResponse(AccountPages.INVITATIONS);
+    }
+
 
     public static UriBuilder loginRedirectUrl(UriBuilder base) {
         return RealmsResource.accountUrl(base).path(AccountFormService.class, "loginRedirect");

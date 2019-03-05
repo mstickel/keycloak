@@ -63,4 +63,4 @@ target
 
 # testsuite #
 #############
-*offline-token.txt
+*offline-invitationToken.txt

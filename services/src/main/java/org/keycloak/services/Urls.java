@@ -158,6 +158,14 @@ public class Urls {
         return accountBase(baseUri).path(AccountFormService.class, "shareResource").build(realmName, resourceId);
     }
 
+    public static URI accountInvitationsPage(URI baseUri, String realmName) {
+        return accountBase(baseUri).path(AccountFormService.class, "invitationsPage").build(realmName);
+    }
+
+    public static URI accountSendInvitePage(URI baseUri, String realmName) {
+        return accountBase(baseUri).path(AccountFormService.class, "sendInvitePage").build(realmName);
+    }
+
     public static URI loginActionUpdatePassword(URI baseUri, String realmName) {
         return loginActionsBase(baseUri).path(LoginActionsService.class, "updatePassword").build(realmName);
     }
@@ -268,4 +276,5 @@ public class Urls {
     private static UriBuilder themeBase(URI baseUri) {
         return UriBuilder.fromUri(baseUri).path(ThemeResource.class);
     }
+
 }

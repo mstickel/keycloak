@@ -16,6 +16,7 @@
  */
 package org.keycloak.forms.login.freemarker.model;
 
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RequiredCredentialModel;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -94,4 +95,11 @@ public class RealmBean {
         return false;
     }
 
+    public String getInvitation() {
+        return realm.getInvitation().name();
+    }
+
+    public boolean isInvitationRequired() {
+        return InvitationStatus.REQUIRED.equals(realm.getInvitation());
+    }
 }
