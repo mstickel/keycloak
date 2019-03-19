@@ -81,6 +81,7 @@
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doRegister")}"/>
                 </div>
             </div>
+            <input type="hidden" name="invite" value="${(register.formData.invite!'')}" />
         </form>
     </#if>
 </@layout.registrationLayout>

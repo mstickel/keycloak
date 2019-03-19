@@ -39,6 +39,7 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.common.VerificationException;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.common.util.Time;
 import org.keycloak.crypto.SignatureProvider;
 import org.keycloak.crypto.SignatureVerifierContext;
@@ -47,16 +48,10 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.exceptions.TokenNotActiveException;
-import org.keycloak.models.ActionTokenKeyModel;
-import org.keycloak.models.AuthenticationFlowModel;
-import org.keycloak.models.ClientModel;
-import org.keycloak.models.ClientScopeModel;
-import org.keycloak.models.ClientSessionContext;
-import org.keycloak.models.Constants;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserConsentModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.invite.InvitationProvider;
+import org.keycloak.invite.InvitationProviderFactory;
+import org.keycloak.invite.InvitationService;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.AuthenticationFlowResolver;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.models.utils.KeycloakModelUtils;
@@ -115,6 +110,7 @@ public class LoginActionsService {
     public static final String REQUIRED_ACTION = "required-action";
     public static final String FIRST_BROKER_LOGIN_PATH = "first-broker-login";
     public static final String POST_BROKER_LOGIN_PATH = "post-broker-login";
+    public static final String INVITATION_PATH = "invitation";
 
     public static final String RESTART_PATH = "restart";
 
@@ -122,6 +118,7 @@ public class LoginActionsService {
 
     public static final String SESSION_CODE = "session_code";
     public static final String AUTH_SESSION_ID = "auth_session_id";
+    private static final String INVITATION_TOKEN = "invite";
 
     private RealmModel realm;
 
@@ -640,8 +637,9 @@ public class LoginActionsService {
                                  @QueryParam(SESSION_CODE) String code,
                                  @QueryParam(Constants.EXECUTION) String execution,
                                  @QueryParam(Constants.CLIENT_ID) String clientId,
-                                 @QueryParam(Constants.TAB_ID) String tabId) {
-        return registerRequest(authSessionId, code, execution, clientId,  tabId,false);
+                                 @QueryParam(Constants.TAB_ID) String tabId,
+                                 @QueryParam(INVITATION_TOKEN) String invitationToken) {
+        return registerRequest(authSessionId, code, execution, clientId,  tabId,false, invitationToken);
     }
 
 
@@ -657,17 +655,21 @@ public class LoginActionsService {
                                     @QueryParam(SESSION_CODE) String code,
                                     @QueryParam(Constants.EXECUTION) String execution,
                                     @QueryParam(Constants.CLIENT_ID) String clientId,
-                                    @QueryParam(Constants.TAB_ID) String tabId) {
-        return registerRequest(authSessionId, code, execution, clientId,  tabId,true);
+                                    @QueryParam(Constants.TAB_ID) String tabId,
+                                    @QueryParam(INVITATION_TOKEN) String invitationToken) {
+        return registerRequest(authSessionId, code, execution, clientId,  tabId,true, invitationToken);
     }
 
 
-    private Response registerRequest(String authSessionId, String code, String execution, String clientId, String tabId, boolean isPostRequest) {
+    private Response registerRequest(String authSessionId, String code, String execution, String clientId, String tabId, boolean isPostRequest,
+                                     String invitationToken) {
         event.event(EventType.REGISTER);
         if (!realm.isRegistrationAllowed()) {
             event.error(Errors.REGISTRATION_DISABLED);
             return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.REGISTRATION_NOT_ALLOWED);
         }
+
+        logger.info("Invitation token received during registration:  " + invitationToken);
 
         SessionCodeChecks checks = checksForCode(authSessionId, code, execution, clientId, tabId, REGISTRATION_PATH);
         if (!checks.verifyActiveAndValidAction(AuthenticationSessionModel.Action.AUTHENTICATE.name(), ClientSessionCode.ActionType.LOGIN)) {
@@ -679,6 +681,49 @@ public class LoginActionsService {
         AuthenticationManager.expireIdentityCookie(realm, session.getContext().getUri(), clientConnection);
 
         return processRegistration(checks.isActionRequest(), execution, authSession, null);
+    }
+
+
+
+    /**
+     * Invitation processing, which redirects to registration page.  Clicking on an invite link in an email will direct to here.
+     */
+    @Path(INVITATION_PATH)
+    @GET
+    public Response handleInvitation(@QueryParam(INVITATION_TOKEN) String invitationToken) {
+        event.event(EventType.ACCEPT_INVITE);
+        if (!realm.isRegistrationAllowed()) {
+            event.error(Errors.REGISTRATION_DISABLED);
+            return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.REGISTRATION_NOT_ALLOWED);
+        }
+        if (InvitationStatus.DISABLED.equals(realm.getInvitation())) {
+            event.error(Errors.INVITATION_DISABLED);
+            return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.INVITATION_NOT_ALLOWED);
+        }
+
+        if (invitationToken == null || invitationToken.isEmpty()) {
+            event.error(Errors.INVITATION_NOT_FOUND);
+            return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.INVITATION_TOKEN_NOT_FOUND);
+        }
+
+        logger.info("Invitation token received during invitation processing:  " + invitationToken);
+
+        InvitationProviderFactory invitationProviderFactory = (InvitationProviderFactory) session
+                .getKeycloakSessionFactory().getProviderFactory(InvitationProvider.class);
+        InvitationProvider invitationProvider = invitationProviderFactory.create(session);
+
+        InvitationService invitationService = new InvitationService(invitationProvider);
+
+        InvitationModel invitation = invitationService.lookUpInvitation(invitationToken);
+
+        if (invitation == null) {
+            event.error(Errors.INVITATION_NOT_FOUND);
+            return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.INVITATION_TOKEN_NOT_FOUND);
+        }
+
+        SessionCodeChecks checks = checksForCode(null, null, null, null, null, REGISTRATION_PATH);
+        // TODO set invitationToken so it gets passed through?
+        return checks.getResponse();
     }
 
 

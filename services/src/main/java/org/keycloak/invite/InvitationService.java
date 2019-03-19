@@ -1,5 +1,6 @@
 package org.keycloak.invite;
 
+import org.keycloak.models.InvitationModel;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
@@ -21,5 +22,13 @@ public class InvitationService {
 
     String generateInviteToken() {
         return UUID.randomUUID().toString();
+    }
+
+    public InvitationModel lookUpInvitation(String invitationToken) {
+        return invitationProvider.findByToken(invitationToken);
+    }
+
+    public boolean markUsed(String invitationToken) {
+        return invitationProvider.markUsed(invitationToken);
     }
 }

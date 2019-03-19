@@ -232,4 +232,5 @@ public class Messages {
 
     public static final String INVITATION_NOT_ALLOWED = "invitationNotAllowed";
     public static final String INVITE_SENT = "invitationSent";
+    public static final String INVITATION_TOKEN_NOT_FOUND = "invitationNotFound";
 }

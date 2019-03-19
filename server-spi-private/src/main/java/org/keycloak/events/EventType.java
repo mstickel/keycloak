@@ -131,7 +131,8 @@ public enum EventType {
     PERMISSION_TOKEN_ERROR(false),
 
     SEND_INVITE(true),
-    ACCEPT_INVITE(true);
+    ACCEPT_INVITE(true),
+    ACCEPT_INVITE_ERROR(false);
 
     private boolean saveByDefault;
 

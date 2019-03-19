@@ -13,4 +13,8 @@ public interface InvitationProvider extends Provider {
                            Long dateSent);
 
     List<InvitationModel> findForUser(RealmModel realmModel, UserModel userModel);
+
+    InvitationModel findByToken(String invitationToken);
+
+    boolean markUsed(String invitationToken);
 }

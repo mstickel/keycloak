@@ -36,6 +36,7 @@ import org.keycloak.events.EventStoreProvider;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.account.AccountPages;
 import org.keycloak.forms.account.AccountProvider;
+import org.keycloak.forms.login.LoginFormsPages;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.invite.InvitationProvider;
 import org.keycloak.invite.InvitationProviderFactory;
@@ -963,7 +964,6 @@ public class AccountFormService extends AbstractSecuredLocalService {
         List<InvitationModel> invitations = invitationProvider.findForUser(realm, auth.getUser());
         return account.setSuccess(Messages.INVITE_SENT).setInvitations(invitations).createResponse(AccountPages.INVITATIONS);
     }
-
 
     public static UriBuilder loginRedirectUrl(UriBuilder base) {
         return RealmsResource.accountUrl(base).path(AccountFormService.class, "loginRedirect");

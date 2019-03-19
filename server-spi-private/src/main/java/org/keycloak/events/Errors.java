@@ -93,4 +93,5 @@ public interface Errors {
     String DISPLAY_UNSUPPORTED = "display_unsupported";
 
     String INVITATION_DISABLED = "invitation_disabled";
+    String INVITATION_NOT_FOUND = "invitation_not_found";
 }

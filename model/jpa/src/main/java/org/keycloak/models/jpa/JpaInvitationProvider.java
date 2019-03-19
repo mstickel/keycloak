@@ -10,6 +10,7 @@ import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.models.utils.KeycloakModelUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,38 @@ public class JpaInvitationProvider implements InvitationProvider {
             .setParameter("id", user.getId())
             .getResultList();
         return invitations.stream().map(ie -> new InvitationAdapter(realm, entityManager, ie, session)).collect(Collectors.toList());
+    }
+
+    @Override
+    public InvitationModel findByToken(String invitationToken) {
+        try {
+            InvitationEntity entity = this.entityManager.createNamedQuery("findInvitationByToken", InvitationEntity.class)
+                    .setParameter("token", invitationToken)
+                    .getSingleResult();
+            RealmModel realm = session.realms().getRealm(entity.getRealmId());
+            return new InvitationAdapter(realm, entityManager, entity, session);
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean markUsed(String invitationToken) {
+        try {
+            InvitationEntity entity = this.entityManager.createNamedQuery("findInvitationByToken", InvitationEntity.class)
+                    .setParameter("token", invitationToken)
+                    .getSingleResult();
+            if (!entity.isUsed()) {
+                entity.setUsed(true);
+                this.entityManager.persist(entity);
+                this.entityManager.flush();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NoResultException e) {
+            return false;
+        }
     }
 
     @Override
