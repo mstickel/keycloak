@@ -37,6 +37,7 @@ public interface Details {
     String IDENTITY_PROVIDER_USERNAME = "identity_provider_identity";
     String REGISTER_METHOD = "register_method";
     String USERNAME = "username";
+    String INVITE = "invitation_token";
     String REMEMBER_ME = "remember_me";
     String TOKEN_ID = "token_id";
     String REFRESH_TOKEN_ID = "refresh_token_id";

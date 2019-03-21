@@ -94,4 +94,5 @@ public interface Errors {
 
     String INVITATION_DISABLED = "invitation_disabled";
     String INVITATION_NOT_FOUND = "invitation_not_found";
+    String INVITATION_REQUIRED = "invitation_required";
 }

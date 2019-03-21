@@ -196,6 +196,7 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
                 attributes.put("idpAlias", idpAlias);
                 break;
             case REGISTER:
+                attributes.put("invite", (uriInfo != null && uriInfo.getQueryParameters() != null ? uriInfo.getQueryParameters().getFirst("invite") : null));
                 attributes.put("register", new RegisterBean(formData));
                 break;
             case OAUTH_GRANT:

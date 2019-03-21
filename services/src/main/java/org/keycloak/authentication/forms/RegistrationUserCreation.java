@@ -22,6 +22,7 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
+import org.keycloak.common.enums.InvitationStatus;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
@@ -68,8 +69,10 @@ public class RegistrationUserCreation implements FormAction, FormActionFactory {
 
         String email = formData.getFirst(Validation.FIELD_EMAIL);
         String username = formData.getFirst(RegistrationPage.FIELD_USERNAME);
+        String invite = formData.getFirst(RegistrationPage.FIELD_INVITE);
         context.getEvent().detail(Details.USERNAME, username);
         context.getEvent().detail(Details.EMAIL, email);
+        context.getEvent().detail(Details.INVITE, invite);
 
         String usernameField = RegistrationPage.FIELD_USERNAME;
         if (context.getRealm().isRegistrationEmailAsUsername()) {
@@ -110,6 +113,18 @@ public class RegistrationUserCreation implements FormAction, FormActionFactory {
             }
 
         }
+        if (InvitationStatus.DISABLED.equals(context.getRealm().getInvitation()) && !Validation.isBlank(invite)) {
+            context.error(Errors.INVITATION_DISABLED);
+            errors.add(new FormMessage(Messages.USERNAME_EXISTS));
+            context.validationError(formData, errors);
+            return;
+        } else if (InvitationStatus.REQUIRED.equals(context.getRealm().getInvitation()) && Validation.isBlank(invite)) {
+            context.error(Errors.INVITATION_REQUIRED);
+            errors.add(new FormMessage(Messages.USERNAME_EXISTS));
+            context.validationError(formData, errors);
+            return;
+        }
+
         context.success();
     }
 
@@ -123,12 +138,14 @@ public class RegistrationUserCreation implements FormAction, FormActionFactory {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String email = formData.getFirst(Validation.FIELD_EMAIL);
         String username = formData.getFirst(RegistrationPage.FIELD_USERNAME);
+        String invite = formData.getFirst(RegistrationPage.FIELD_INVITE);
         if (context.getRealm().isRegistrationEmailAsUsername()) {
             username = formData.getFirst(RegistrationPage.FIELD_EMAIL);
         }
         context.getEvent().detail(Details.USERNAME, username)
                 .detail(Details.REGISTER_METHOD, "form")
                 .detail(Details.EMAIL, email)
+                .detail(Details.INVITE, invite);
         ;
         UserModel user = context.getSession().users().addUser(context.getRealm(), username);
         user.setEnabled(true);

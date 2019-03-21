@@ -43,6 +43,7 @@ public class RegistrationPage implements FormAuthenticator, FormAuthenticatorFac
     public static final String FIELD_LAST_NAME = "lastName";
     public static final String FIELD_FIRST_NAME = "firstName";
     public static final String PROVIDER_ID = "registration-page-form";
+    public static final String FIELD_INVITE = "invite";
 
     @Override
     public Response render(FormContext context, LoginFormsProvider form) {

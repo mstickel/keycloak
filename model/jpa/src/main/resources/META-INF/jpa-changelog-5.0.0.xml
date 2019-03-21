@@ -20,7 +20,7 @@
 
     <changeSet author="stickelm@gmail.com" id="5.0.0-invitation-support">
         <addColumn tableName="REALM">
-            <column name="INVITATION" type="VARCHAR(32)" defaultValue="disabled">
+            <column name="INVITATION" type="VARCHAR(32)" defaultValue="DISABLED">
                 <constraints nullable="true" />
             </column>
         </addColumn>

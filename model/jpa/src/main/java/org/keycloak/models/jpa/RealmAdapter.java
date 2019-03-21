@@ -136,7 +136,7 @@ public class RealmAdapter implements RealmModel, JpaModel<RealmEntity> {
     @Override
     public void setInvitation(InvitationStatus invitation) {
         realm.setInvitation(invitation.name());
-        em.flush();;
+        em.flush();
     }
 
     @Override
