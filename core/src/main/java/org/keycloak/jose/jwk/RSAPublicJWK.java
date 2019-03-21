@@ -18,6 +18,10 @@
 package org.keycloak.jose.jwk;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.keycloak.common.util.Base64;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -38,7 +42,9 @@ public class RSAPublicJWK extends JWK {
 
     @JsonProperty("x5c")
     private String[] x509CertificateChain;
-    
+
+    private String x509Thumbprint;
+
     public String getModulus() {
         return modulus;
     }
@@ -61,6 +67,27 @@ public class RSAPublicJWK extends JWK {
 
     public void setX509CertificateChain(String[] x509CertificateChain) {
         this.x509CertificateChain = x509CertificateChain;
+        if (x509CertificateChain != null && x509CertificateChain.length > 0) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                x509Thumbprint = Base64.encodeBytes(md.digest(x509CertificateChain[0].getBytes()));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @JsonProperty("x5t")
+    public String getX509Thumbprint() {
+        return x509Thumbprint;
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hash) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
 }
